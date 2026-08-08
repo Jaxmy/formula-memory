@@ -176,7 +176,8 @@ function show(){
   if(index>=queue.length){finish();return} const f=queue[index]; choiceLocked=false;
   $('#quizTag').textContent=f.category;$('#count').textContent=`${index+1} / ${queue.length}`;$('#bar').style.width=`${index/queue.length*100}%`;
   const parts=formulaParts(f);$('#question').innerHTML=parts.left+' = ?';$('#hint').textContent='';$('#answerBox').classList.add('hidden');$('#grades').classList.add('hidden');$('#choices').classList.add('hidden');$('#reveal').classList.add('hidden');
-  $('#promptLabel').textContent=mode==='recall'?'请先在脑中或纸上写出答案':'请选择正确答案';
+  const instruction=mode==='recall'?'请先在脑中或纸上写出答案':'请选择正确答案';
+  $('#promptLabel').innerHTML=f.category==='概率'?`<strong>${f.question}</strong><br><span>${instruction}</span>`:instruction;
   if(mode==='recall')$('#reveal').classList.remove('hidden');else makeChoices(f);
 }
 function reveal(){const f=queue[index];$('#answer').innerHTML=formulaParts(f).right;$('#note').textContent=f.note;$('#answerBox').classList.remove('hidden');$('#grades').classList.remove('hidden');$('#reveal').classList.add('hidden')}
@@ -189,7 +190,7 @@ function makeChoices(f){
 }
 function choose(btn,f){
   if(choiceLocked)return;choiceLocked=true;const ok=btn.dataset.id===f.id;$$('#choices .choice').forEach(b=>{b.disabled=true;if(b.dataset.id===f.id)b.classList.add('correct')});if(!ok)btn.classList.add('wrong');
-  $('#answer').innerHTML=formulaParts(f).right;$('#note').textContent=f.note;$('#answerBox').classList.remove('hidden');setTimeout(()=>grade(ok?'good':'bad'),850);
+  $('#answer').innerHTML=formulaParts(f).right;$('#note').textContent=f.note;$('#answerBox').classList.remove('hidden');setTimeout(()=>grade(ok?'good':'bad'),2500);
 }
 function grade(g){
   const f=queue[index],s=store.stats[f.id]||(store.stats[f.id]={good:0,fuzzy:0,bad:0});s[g]=(s[g]||0)+1;s.last=g;s.at=Date.now();round[g]++;if(g!=='good'&&!roundWeak.some(x=>x.id===f.id))roundWeak.push(f);
