@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>公式速记</title>
+  <style>
+    :root{--bg:#f5f2eb;--card:#fffefa;--ink:#1f2933;--muted:#6b7280;--line:#ddd6c8;--accent:#176b5b;--accent2:#e6f1ed;--bad:#a33d32;--mid:#ad741f;--shadow:0 12px 36px rgba(42,35,22,.09)}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(145deg,#f1ede3,#faf8f2 55%,#edf4f1);color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",sans-serif;min-height:100vh}
+    button,select{font:inherit} button{cursor:pointer}.wrap{max-width:880px;margin:auto;padding:32px 18px 60px}.top{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:20px}.brand h1{margin:0;font-family:Georgia,"Microsoft YaHei",serif;font-size:34px;letter-spacing:.04em}.brand p{margin:7px 0 0;color:var(--muted)}
+    .streak{background:#fff9e8;border:1px solid #eadcaf;border-radius:14px;padding:9px 13px;font-weight:650;white-space:nowrap}.panel,.quiz{background:rgba(255,254,250,.96);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}.panel{padding:22px}.grid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px}.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 7px}.field select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:white;color:var(--ink)}
+    .modes{display:flex;gap:8px}.mode{flex:1;background:white;border:1px solid var(--line);border-radius:11px;padding:10px 8px}.mode.active{background:var(--accent2);border-color:var(--accent);color:var(--accent);font-weight:700}.actions{display:flex;gap:10px;margin-top:18px}.primary,.secondary,.grade,.choice{border-radius:12px;padding:11px 16px;border:1px solid var(--line);background:white}.primary{background:var(--accent);color:white;border-color:var(--accent);font-weight:700}.secondary{color:var(--accent);border-color:#9bbeb6}.primary:hover{filter:brightness(.96)}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.stat{background:#f8f6ef;border-radius:12px;padding:12px;text-align:center}.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+    .quiz{margin-top:18px;overflow:hidden}.quiz-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}.tag{font-size:12px;background:var(--accent2);color:var(--accent);padding:5px 9px;border-radius:999px}.progress{height:7px;background:#eee9df;flex:1;border-radius:8px;overflow:hidden}.bar{height:100%;background:var(--accent);width:0;transition:width .25s}.count{font-size:13px;color:var(--muted)}
+    .quiz-body{padding:42px 24px 30px;text-align:center;min-height:385px;display:flex;flex-direction:column;align-items:center}.prompt-label{color:var(--muted);font-size:14px}.formula{font-family:Cambria,"Times New Roman",serif;font-size:30px;line-height:1.55;margin:20px 0;min-height:62px}.hint{font-size:13px;color:var(--muted);margin-top:-7px}.answer{width:min(650px,100%);background:#f4f8f6;border:1px solid #bed5cf;border-radius:15px;padding:17px;margin:10px 0 18px}.answer .formula{margin:3px 0;min-height:0}.note{font-size:13px;color:var(--muted)}.grades{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}.grade{min-width:115px}.grade.good{border-color:#77aa90;color:#236a50}.grade.fuzzy{border-color:#d0aa67;color:#8a5b11}.grade.bad{border-color:#ce8e88;color:var(--bad)}
+    .choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(700px,100%);margin-top:8px}.choice{font-family:Cambria,"Times New Roman",serif;font-size:20px;min-height:64px}.choice:hover{border-color:var(--accent)}.choice.correct{background:#e5f4ec;border-color:#5c9e79}.choice.wrong{background:#f9e7e5;border-color:#bd655b}.hidden{display:none!important}.result h2{font-family:Georgia,"Microsoft YaHei",serif}.result-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.tiny{margin-top:14px;color:var(--muted);font-size:12px}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+    @media(max-width:650px){.wrap{padding:20px 12px 40px}.top{align-items:start}.brand h1{font-size:28px}.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.quiz-body{padding:30px 15px}.formula{font-size:25px}.choices{grid-template-columns:1fr}.streak{font-size:13px}.actions{flex-wrap:wrap}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top"><div class="brand"><h1>公式速记</h1><p>先回忆，再揭晓；把模糊公式留到下一轮。</p></div><div class="streak">今日练习 <span id="todayCount">0</span> 题</div></header>
+  <section class="panel" id="setup">
+    <div class="grid">
+      <div class="field"><label for="category">公式范围</label><select id="category"></select></div>
+      <div class="field"><label>训练方式</label><div class="modes"><button class="mode active" data-mode="recall">主动回忆</button><button class="mode" data-mode="choice">选择题</button></div></div>
+      <div class="field"><label for="amount">每轮题数</label><select id="amount"><option value="10">10 题</option><option value="20" selected>20 题</option><option value="40">40 题</option><option value="999">全部</option></select></div>
+    </div>
+    <div class="actions"><button class="primary" id="start">开始练习</button><button class="secondary" id="weakStart">练习历史薄弱项</button><button class="secondary" id="reset">清除记录</button></div>
+    <div class="summary"><div class="stat"><b id="formulaCount">0</b><span>公式总数</span></div><div class="stat"><b id="learnedCount">0</b><span>练习过</span></div><div class="stat"><b id="goodRate">—</b><span>记住率</span></div><div class="stat"><b id="weakCount">0</b><span>待加强</span></div></div>
+  </section>
+  <section class="quiz hidden" id="quiz">
+    <div class="quiz-head"><span class="tag" id="quizTag"></span><div class="progress"><div class="bar" id="bar"></div></div><span class="count" id="count"></span></div>
+    <div class="quiz-body">
+      <div class="prompt-label" id="promptLabel">请先在脑中或纸上写出答案</div>
+      <div class="formula" id="question"></div><div class="hint" id="hint"></div>
+      <button class="primary" id="reveal">显示答案</button>
+      <div class="answer hidden" id="answerBox"><div class="prompt-label">答案</div><div class="formula" id="answer"></div><div class="note" id="note"></div></div>
+      <div class="grades hidden" id="grades"><button class="grade good" data-grade="good">记住了</button><button class="grade fuzzy" data-grade="fuzzy">有点模糊</button><button class="grade bad" data-grade="bad">没记住</button></div>
+      <div class="choices hidden" id="choices"></div>
+      <div class="result hidden" id="result"><h2>本轮完成</h2><p id="resultText"></p><div class="result-buttons"><button class="primary" id="retry">重练本轮薄弱项</button><button class="secondary" id="back">返回首页</button></div><p class="tiny">“有点模糊”和“没记住”的公式会进入薄弱项。</p></div>
+    </div>
+  </section>
+  <p class="footer">学习记录仅保存在当前浏览器中。公式采用常见教材约定。</p>
+</main>
+<script>
+const F = [
+// 求导（18）
+['d01','求导','常数函数的导数','(C)′ = 0','常数的导数为零'],
+['d02','求导','幂函数的导数','(x<sup>α</sup>)′ = αx<sup>α−1</sup>','指数降一，原指数乘到前面'],
+['d03','求导','指数函数 e<sup>x</sup> 的导数','(e<sup>x</sup>)′ = e<sup>x</sup>','求导后不变'],
+['d04','求导','一般指数函数 a<sup>x</sup> 的导数','(a<sup>x</sup>)′ = a<sup>x</sup> ln a','a &gt; 0 且 a ≠ 1'],
+['d05','求导','自然对数的导数','(ln x)′ = 1/x','x &gt; 0'],
+['d06','求导','一般对数的导数','(log<sub>a</sub>x)′ = 1/(x ln a)','a &gt; 0 且 a ≠ 1'],
+['d07','求导','正弦函数的导数','(sin x)′ = cos x','正弦变余弦'],
+['d08','求导','余弦函数的导数','(cos x)′ = −sin x','注意负号'],
+['d09','求导','正切函数的导数','(tan x)′ = sec<sup>2</sup>x',''],
+['d10','求导','余切函数的导数','(cot x)′ = −csc<sup>2</sup>x','注意负号'],
+['d11','求导','正割函数的导数','(sec x)′ = sec x tan x',''],
+['d12','求导','余割函数的导数','(csc x)′ = −csc x cot x','注意负号'],
+['d13','求导','反正弦函数的导数','(arcsin x)′ = 1/√(1−x<sup>2</sup>)','|x| &lt; 1'],
+['d14','求导','反余弦函数的导数','(arccos x)′ = −1/√(1−x<sup>2</sup>)','注意负号'],
+['d15','求导','反正切函数的导数','(arctan x)′ = 1/(1+x<sup>2</sup>)',''],
+['d16','求导','乘积求导法则','(uv)′ = u′v + uv′',''],
+['d17','求导','商的求导法则','(u/v)′ = (u′v−uv′)/v<sup>2</sup>','分母平方；分子顺序不要反'],
+['d18','求导','复合函数链式法则','[f(g(x))]′ = f′(g(x))g′(x)','外层求导乘以内层求导'],
+// 积分（18）
+['i01','积分','幂函数的积分','∫x<sup>α</sup>dx = x<sup>α+1</sup>/(α+1) + C','α ≠ −1'],
+['i02','积分','1/x 的积分','∫(1/x)dx = ln|x| + C','注意绝对值'],
+['i03','积分','e<sup>x</sup> 的积分','∫e<sup>x</sup>dx = e<sup>x</sup> + C',''],
+['i04','积分','a<sup>x</sup> 的积分','∫a<sup>x</sup>dx = a<sup>x</sup>/ln a + C','a &gt; 0 且 a ≠ 1'],
+['i05','积分','sin x 的积分','∫sin x dx = −cos x + C','注意负号'],
+['i06','积分','cos x 的积分','∫cos x dx = sin x + C',''],
+['i07','积分','sec<sup>2</sup>x 的积分','∫sec<sup>2</sup>x dx = tan x + C',''],
+['i08','积分','csc<sup>2</sup>x 的积分','∫csc<sup>2</sup>x dx = −cot x + C','注意负号'],
+['i09','积分','sec x tan x 的积分','∫sec x tan x dx = sec x + C',''],
+['i10','积分','csc x cot x 的积分','∫csc x cot x dx = −csc x + C','注意负号'],
+['i11','积分','tan x 的积分','∫tan x dx = −ln|cos x| + C','也等于 ln|sec x|+C'],
+['i12','积分','cot x 的积分','∫cot x dx = ln|sin x| + C',''],
+['i13','积分','反正切积分原型','∫dx/(1+x<sup>2</sup>) = arctan x + C',''],
+['i14','积分','反正弦积分原型','∫dx/√(1−x<sup>2</sup>) = arcsin x + C',''],
+['i15','积分','一般反正切积分原型','∫dx/(a<sup>2</sup>+x<sup>2</sup>) = (1/a)arctan(x/a) + C','通常取 a &gt; 0'],
+['i16','积分','换元积分法','令 u=g(x)，则 ∫f(g(x))g′(x)dx = ∫f(u)du',''],
+['i17','积分','分部积分公式','∫u dv = uv − ∫v du',''],
+['i18','积分','牛顿—莱布尼茨公式','∫<sub>a</sub><sup>b</sup> f(x)dx = F(b)−F(a)','其中 F′=f'],
+// 三角（18）
+['t01','三角','三角函数基本平方关系','sin<sup>2</sup>x + cos<sup>2</sup>x = 1',''],
+['t02','三角','正切与正割的平方关系','1 + tan<sup>2</sup>x = sec<sup>2</sup>x',''],
+['t03','三角','余切与余割的平方关系','1 + cot<sup>2</sup>x = csc<sup>2</sup>x',''],
+['t04','三角','正切的商式定义','tan x = sin x / cos x',''],
+['t05','三角','正弦的和角公式','sin(α+β) = sin α cos β + cos α sin β',''],
+['t06','三角','正弦的差角公式','sin(α−β) = sin α cos β − cos α sin β',''],
+['t07','三角','余弦的和角公式','cos(α+β) = cos α cos β − sin α sin β','和角中间是负号'],
+['t08','三角','余弦的差角公式','cos(α−β) = cos α cos β + sin α sin β','差角中间是正号'],
+['t09','三角','正切的和角公式','tan(α+β) = (tan α+tan β)/(1−tan α tan β)',''],
+['t10','三角','正切的差角公式','tan(α−β) = (tan α−tan β)/(1+tan α tan β)',''],
+['t11','三角','正弦倍角公式','sin 2x = 2sin x cos x',''],
+['t12','三角','余弦倍角公式（平方差）','cos 2x = cos<sup>2</sup>x − sin<sup>2</sup>x',''],
+['t13','三角','余弦倍角公式（余弦）','cos 2x = 2cos<sup>2</sup>x − 1',''],
+['t14','三角','余弦倍角公式（正弦）','cos 2x = 1 − 2sin<sup>2</sup>x',''],
+['t15','三角','正切倍角公式','tan 2x = 2tan x/(1−tan<sup>2</sup>x)',''],
+['t16','三角','正弦平方降幂公式','sin<sup>2</sup>x = (1−cos 2x)/2',''],
+['t17','三角','余弦平方降幂公式','cos<sup>2</sup>x = (1+cos 2x)/2',''],
+['t18','三角','正弦余弦乘积公式','sin x cos x = (1/2)sin 2x',''],
+// 级数（8）
+['s01','级数','几何级数展开','1/(1−x) = Σ<sub>n=0</sub><sup>∞</sup>x<sup>n</sup>，|x|&lt;1',''],
+['s02','级数','1/(1+x) 的级数展开','1/(1+x) = Σ<sub>n=0</sub><sup>∞</sup>(−1)<sup>n</sup>x<sup>n</sup>，|x|&lt;1',''],
+['s03','级数','e<sup>x</sup> 的麦克劳林展开','e<sup>x</sup> = Σ<sub>n=0</sub><sup>∞</sup>x<sup>n</sup>/n!','= 1+x+x²/2!+⋯'],
+['s04','级数','sin x 的麦克劳林展开','sin x = Σ<sub>n=0</sub><sup>∞</sup>(−1)<sup>n</sup>x<sup>2n+1</sup>/(2n+1)!','= x−x³/3!+x⁵/5!−⋯'],
+['s05','级数','cos x 的麦克劳林展开','cos x = Σ<sub>n=0</sub><sup>∞</sup>(−1)<sup>n</sup>x<sup>2n</sup>/(2n)!','= 1−x²/2!+x⁴/4!−⋯'],
+['s06','级数','ln(1+x) 的级数展开','ln(1+x) = Σ<sub>n=1</sub><sup>∞</sup>(−1)<sup>n−1</sup>x<sup>n</sup>/n，−1&lt;x≤1','= x−x²/2+x³/3−⋯'],
+['s07','级数','arctan x 的级数展开','arctan x = Σ<sub>n=0</sub><sup>∞</sup>(−1)<sup>n</sup>x<sup>2n+1</sup>/(2n+1)，|x|≤1','= x−x³/3+x⁵/5−⋯'],
+['s08','级数','函数在 x=a 处的泰勒展开','f(x) = Σ<sub>n=0</sub><sup>∞</sup> f<sup>(n)</sup>(a)(x−a)<sup>n</sup>/n!','需满足相应收敛条件'],
+// 拉普拉斯（10）
+['l01','拉普拉斯','常数 1 的拉普拉斯变换','ℒ{1} = 1/s',''],
+['l02','拉普拉斯','t<sup>n</sup> 的拉普拉斯变换','ℒ{t<sup>n</sup>} = n!/s<sup>n+1</sup>','n=0,1,2,…'],
+['l03','拉普拉斯','e<sup>at</sup> 的拉普拉斯变换','ℒ{e<sup>at</sup>} = 1/(s−a)',''],
+['l04','拉普拉斯','sin(bt) 的拉普拉斯变换','ℒ{sin bt} = b/(s<sup>2</sup>+b<sup>2</sup>)',''],
+['l05','拉普拉斯','cos(bt) 的拉普拉斯变换','ℒ{cos bt} = s/(s<sup>2</sup>+b<sup>2</sup>)','分子是 s'],
+['l06','拉普拉斯','指数位移性质','ℒ{e<sup>at</sup>f(t)} = F(s−a)','其中 ℒ{f}=F'],
+['l07','拉普拉斯','时间延迟性质','ℒ{u(t−a)f(t−a)} = e<sup>−as</sup>F(s)',''],
+['l08','拉普拉斯','一阶导数的拉普拉斯变换','ℒ{f′(t)} = sF(s)−f(0)',''],
+['l09','拉普拉斯','二阶导数的拉普拉斯变换','ℒ{f″(t)} = s<sup>2</sup>F(s)−sf(0)−f′(0)',''],
+['l10','拉普拉斯','卷积定理','ℒ{f*g} = F(s)G(s)','(f*g)(t)=∫₀ᵗf(τ)g(t−τ)dτ'],
+// 概率（10）
+['p01','概率','伯努利分布的概率质量函数','P(X=x)=p<sup>x</sup>(1−p)<sup>1−x</sup>，x∈{0,1}','E(X)=p；Var(X)=p(1−p)'],
+['p02','概率','二项分布 B(n,p) 的概率质量函数','P(X=k)=C<sub>n</sub><sup>k</sup>p<sup>k</sup>(1−p)<sup>n−k</sup>','E(X)=np；Var(X)=np(1−p)'],
+['p03','概率','几何分布的概率质量函数','P(X=k)=(1−p)<sup>k−1</sup>p，k=1,2,…','首次成功所需试验次数；E=1/p；Var=(1−p)/p²'],
+['p04','概率','泊松分布 Poisson(λ) 的概率质量函数','P(X=k)=e<sup>−λ</sup>λ<sup>k</sup>/k!','E(X)=Var(X)=λ'],
+['p05','概率','均匀分布 U(a,b) 的概率密度','f(x)=1/(b−a)，a≤x≤b；其他处为 0','E=(a+b)/2；Var=(b−a)²/12'],
+['p06','概率','指数分布 Exp(λ) 的概率密度','f(x)=λe<sup>−λx</sup>，x≥0；其他处为 0','E=1/λ；Var=1/λ²'],
+['p07','概率','正态分布 N(μ,σ<sup>2</sup>) 的概率密度','f(x)=e<sup>−(x−μ)²/(2σ²)</sup>/(σ√(2π))','E=μ；Var=σ²'],
+['p08','概率','正态分布的标准化公式','Z=(X−μ)/σ ∼ N(0,1)',''],
+['p09','概率','方差的计算公式','Var(X)=E(X<sup>2</sup>)−[E(X)]<sup>2</sup>',''],
+['p10','概率','贝叶斯公式','P(B<sub>j</sub>|A)=P(A|B<sub>j</sub>)P(B<sub>j</sub>)/ΣP(A|B<sub>i</sub>)P(B<sub>i</sub>)','分母来自全概率公式']
+].map(([id,category,question,answer,note])=>({id,category,question,answer,note}));
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const key='formula-memory-v1', dayKey=()=>new Date().toISOString().slice(0,10);
+let store=JSON.parse(localStorage.getItem(key)||'{"stats":{},"daily":{}}');
+let mode='recall', queue=[], index=0, roundWeak=[], round={good:0,fuzzy:0,bad:0}, choiceLocked=false;
+const save=()=>localStorage.setItem(key,JSON.stringify(store));
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const selectedPool=()=>{const c=$('#category').value;return c==='全部'?F:F.filter(x=>x.category===c)};
+function init(){
+  const cats=['全部',...new Set(F.map(x=>x.category))]; $('#category').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+  $('#formulaCount').textContent=F.length; refreshStats();
+  $$('.mode').forEach(b=>b.onclick=()=>{$$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode});
+  $('#start').onclick=()=>begin(selectedPool()); $('#weakStart').onclick=()=>{const p=selectedPool().filter(f=>weakScore(f.id)>0);begin(p.length?p:selectedPool())};
+  $('#reset').onclick=()=>{if(confirm('确定清除全部练习记录吗？')){store={stats:{},daily:{}};save();refreshStats()}};
+  $('#reveal').onclick=reveal; $$('.grade').forEach(b=>b.onclick=()=>grade(b.dataset.grade)); $('#retry').onclick=()=>begin(roundWeak); $('#back').onclick=home;
+}
+function weakScore(id){const s=store.stats[id]||{};return (s.bad||0)*3+(s.fuzzy||0)*2-(s.good||0)}
+function begin(pool){
+  if(!pool.length)return; const n=Math.min(Number($('#amount').value),pool.length); queue=shuffle(pool).slice(0,n);index=0;roundWeak=[];round={good:0,fuzzy:0,bad:0};
+  $('#setup').classList.add('hidden');$('#quiz').classList.remove('hidden');$('#result').classList.add('hidden');show();
+}
+function formulaParts(f){
+  const spaced=f.answer.indexOf(' = '),compact=f.answer.indexOf('=');
+  const cut=spaced>=0?spaced:compact;
+  if(cut<0)return {left:f.answer,right:f.answer};
+  return {left:f.answer.slice(0,cut).trim(),right:f.answer.slice(cut+(spaced>=0?3:1)).trim()};
+}
+function plain(html){const el=document.createElement('div');el.innerHTML=html;return (el.textContent||'').replace(/\s+/g,'').toLowerCase()}
+function skeleton(html){return plain(html).replace(/[a-zα-ωμσλτ]+/g,'v').replace(/\d+/g,'n').replace(/v+/g,'v')}
+function editDistance(a,b){
+  const row=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old}}
+  return row[b.length];
+}
+function formalDistance(a,b){
+  const x=plain(a),y=plain(b),sx=skeleton(a),sy=skeleton(b);
+  return editDistance(x,y)/Math.max(x.length,y.length,1)*.55+editDistance(sx,sy)/Math.max(sx.length,sy.length,1)*.35+Math.abs(x.length-y.length)/Math.max(x.length,y.length,1)*.10;
+}
+function show(){
+  if(index>=queue.length){finish();return} const f=queue[index]; choiceLocked=false;
+  $('#quizTag').textContent=f.category;$('#count').textContent=`${index+1} / ${queue.length}`;$('#bar').style.width=`${index/queue.length*100}%`;
+  const parts=formulaParts(f);$('#question').innerHTML=parts.left+' = ?';$('#hint').textContent='';$('#answerBox').classList.add('hidden');$('#grades').classList.add('hidden');$('#choices').classList.add('hidden');$('#reveal').classList.add('hidden');
+  $('#promptLabel').textContent=mode==='recall'?'请先在脑中或纸上写出答案':'请选择正确答案';
+  if(mode==='recall')$('#reveal').classList.remove('hidden');else makeChoices(f);
+}
+function reveal(){const f=queue[index];$('#answer').innerHTML=formulaParts(f).right;$('#note').textContent=f.note;$('#answerBox').classList.remove('hidden');$('#grades').classList.remove('hidden');$('#reveal').classList.add('hidden')}
+function makeChoices(f){
+  const target=formulaParts(f).right,seen=new Set([plain(target)]);
+  const nearest=F.filter(x=>x.id!==f.id).map(x=>({item:x,result:formulaParts(x).right})).filter(x=>{const k=plain(x.result);if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>formalDistance(target,a.result)-formalDistance(target,b.result)).slice(0,3).map(x=>x.item);
+  const opts=shuffle([f,...nearest]);
+  $('#choices').innerHTML=opts.map(x=>`<button class="choice" data-id="${x.id}">${formulaParts(x).right}</button>`).join('');$('#choices').classList.remove('hidden');
+  $$('#choices .choice').forEach(b=>b.onclick=()=>choose(b,f));
+}
+function choose(btn,f){
+  if(choiceLocked)return;choiceLocked=true;const ok=btn.dataset.id===f.id;$$('#choices .choice').forEach(b=>{b.disabled=true;if(b.dataset.id===f.id)b.classList.add('correct')});if(!ok)btn.classList.add('wrong');
+  $('#answer').innerHTML=formulaParts(f).right;$('#note').textContent=f.note;$('#answerBox').classList.remove('hidden');setTimeout(()=>grade(ok?'good':'bad'),850);
+}
+function grade(g){
+  const f=queue[index],s=store.stats[f.id]||(store.stats[f.id]={good:0,fuzzy:0,bad:0});s[g]=(s[g]||0)+1;s.last=g;s.at=Date.now();round[g]++;if(g!=='good'&&!roundWeak.some(x=>x.id===f.id))roundWeak.push(f);
+  const d=dayKey();store.daily[d]=(store.daily[d]||0)+1;save();index++;show();
+}
+function finish(){
+  $('#bar').style.width='100%';$('#question').innerHTML='';$('#hint').textContent='';$('#promptLabel').textContent='';$('#answerBox').classList.add('hidden');$('#grades').classList.add('hidden');$('#choices').classList.add('hidden');$('#reveal').classList.add('hidden');
+  $('#resultText').textContent=`记住 ${round.good} 题，模糊 ${round.fuzzy} 题，没记住 ${round.bad} 题。`;
+  $('#retry').classList.toggle('hidden',!roundWeak.length);$('#result').classList.remove('hidden');refreshStats();
+}
+function home(){$('#quiz').classList.add('hidden');$('#setup').classList.remove('hidden');refreshStats()}
+function refreshStats(){
+  const vals=Object.values(store.stats),total=vals.reduce((n,s)=>n+(s.good||0)+(s.fuzzy||0)+(s.bad||0),0),good=vals.reduce((n,s)=>n+(s.good||0),0);
+  $('#learnedCount').textContent=vals.length;$('#goodRate').textContent=total?Math.round(good/total*100)+'%':'—';$('#weakCount').textContent=F.filter(f=>weakScore(f.id)>0).length;$('#todayCount').textContent=store.daily[dayKey()]||0;
+}
+init();
+</script>
+</body>
+</html>
